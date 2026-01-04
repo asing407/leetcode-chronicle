@@ -1,10 +1,27 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, Target, Zap, Calendar } from 'lucide-react';
+import { TrendingUp, Target, Zap, Calendar, Loader2 } from 'lucide-react';
 import { CircularProgress } from './CircularProgress';
 import { DifficultyCard } from './DifficultyCard';
-import { stats } from '@/data/mockProblems';
+import { stats as mockStats } from '@/data/mockProblems';
+import type { LeetCodeStats } from '@/hooks/useGitHubLeetCode';
 
-export function StatsSection() {
+interface StatsSectionProps {
+  stats?: LeetCodeStats | null;
+  isLoading?: boolean;
+}
+
+export function StatsSection({ stats: githubStats, isLoading }: StatsSectionProps) {
+  // Use GitHub stats if available, otherwise fall back to mock data
+  const stats = githubStats ? {
+    totalSolved: githubStats.totalSolved,
+    totalProblems: 3500, // Approximate total LeetCode problems
+    easy: githubStats.easy,
+    medium: githubStats.medium,
+    hard: githubStats.hard,
+    currentStreak: mockStats.currentStreak,
+    maxStreak: mockStats.maxStreak,
+  } : mockStats;
+
   return (
     <section id="stats" className="py-16">
       <div className="container mx-auto px-6">
@@ -25,8 +42,13 @@ export function StatsSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="lg:col-span-5 bg-card rounded-3xl border border-border p-8 flex flex-col items-center justify-center"
+            className="lg:col-span-5 bg-card rounded-3xl border border-border p-8 flex flex-col items-center justify-center relative"
           >
+            {isLoading && (
+              <div className="absolute inset-0 bg-card/80 backdrop-blur-sm rounded-3xl flex items-center justify-center z-10">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              </div>
+            )}
             <CircularProgress 
               value={stats.totalSolved} 
               max={stats.totalProblems} 
