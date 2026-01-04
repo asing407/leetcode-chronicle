@@ -62,24 +62,59 @@ const languageMap: Record<string, string> = {
 function parseDifficultyFromReadme(content: string): 'Easy' | 'Medium' | 'Hard' {
   const lowerContent = content.toLowerCase();
   
-  // Check for common LeetHub difficulty patterns
-  if (lowerContent.includes('difficulty: easy') || 
-      lowerContent.includes('🟢') || 
-      lowerContent.includes('easy</h2>') ||
-      lowerContent.includes('| easy |') ||
-      lowerContent.match(/\beasy\b.*difficulty/i) ||
-      lowerContent.match(/difficulty.*\beasy\b/i)) {
+  // LeetHub 3.0 uses Shields.io badges - check these first (most reliable)
+  // Easy: badge/-Easy-brightgreen or badge/-Easy-green
+  if (lowerContent.includes('badge/-easy-brightgreen') || 
+      lowerContent.includes('badge/-easy-green') ||
+      lowerContent.includes('badge/easy-brightgreen') ||
+      lowerContent.includes('badge/easy-green')) {
     return 'Easy';
   }
-  if (lowerContent.includes('difficulty: hard') || 
-      lowerContent.includes('🔴') || 
-      lowerContent.includes('hard</h2>') ||
-      lowerContent.includes('| hard |') ||
-      lowerContent.match(/\bhard\b.*difficulty/i) ||
-      lowerContent.match(/difficulty.*\bhard\b/i)) {
+  
+  // Hard: badge/-Hard-red
+  if (lowerContent.includes('badge/-hard-red') ||
+      lowerContent.includes('badge/hard-red')) {
     return 'Hard';
   }
-  // Default to Medium if not clearly easy or hard
+  
+  // Medium: badge/-Medium-orange or badge/-Medium-blue or badge/-Medium-yellow
+  if (lowerContent.includes('badge/-medium-') ||
+      lowerContent.includes('badge/medium-')) {
+    return 'Medium';
+  }
+  
+  // Fallback patterns for other README formats
+  // Check for difficulty text patterns
+  if (lowerContent.includes('difficulty: easy') || 
+      lowerContent.includes('difficulty</strong>: easy') ||
+      lowerContent.includes('| easy |') ||
+      lowerContent.includes('>easy<')) {
+    return 'Easy';
+  }
+  
+  if (lowerContent.includes('difficulty: hard') || 
+      lowerContent.includes('difficulty</strong>: hard') ||
+      lowerContent.includes('| hard |') ||
+      lowerContent.includes('>hard<')) {
+    return 'Hard';
+  }
+  
+  if (lowerContent.includes('difficulty: medium') || 
+      lowerContent.includes('difficulty</strong>: medium') ||
+      lowerContent.includes('| medium |') ||
+      lowerContent.includes('>medium<')) {
+    return 'Medium';
+  }
+  
+  // Check for emoji indicators
+  if (lowerContent.includes('🟢')) return 'Easy';
+  if (lowerContent.includes('🔴')) return 'Hard';
+  if (lowerContent.includes('🟡') || lowerContent.includes('🟠')) return 'Medium';
+  
+  // Log when we can't determine difficulty for debugging
+  console.log('Could not determine difficulty from README, defaulting to Medium');
+  
+  // Default to Medium if nothing matches
   return 'Medium';
 }
 
