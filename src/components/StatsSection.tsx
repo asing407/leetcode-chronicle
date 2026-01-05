@@ -1,26 +1,41 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, Target, Zap, Calendar, Loader2 } from 'lucide-react';
+import { TrendingUp, Target, Loader2 } from 'lucide-react';
 import { CircularProgress } from './CircularProgress';
 import { DifficultyCard } from './DifficultyCard';
-import { stats as mockStats } from '@/data/mockProblems';
 import type { LeetCodeStats } from '@/hooks/useGitHubLeetCode';
+
+type DifficultyFilter = 'all' | 'Easy' | 'Medium' | 'Hard';
 
 interface StatsSectionProps {
   stats?: LeetCodeStats | null;
   isLoading?: boolean;
+  onDifficultyClick?: (difficulty: DifficultyFilter) => void;
+  activeDifficulty?: DifficultyFilter;
 }
 
-export function StatsSection({ stats: githubStats, isLoading }: StatsSectionProps) {
-  // Use GitHub stats if available, otherwise fall back to mock data
+export function StatsSection({ 
+  stats: githubStats, 
+  isLoading, 
+  onDifficultyClick,
+  activeDifficulty = 'all'
+}: StatsSectionProps) {
+  // Use GitHub stats if available
   const stats = githubStats ? {
     totalSolved: githubStats.totalSolved,
     totalProblems: 3500, // Approximate total LeetCode problems
     easy: githubStats.easy,
     medium: githubStats.medium,
     hard: githubStats.hard,
-    currentStreak: mockStats.currentStreak,
-    maxStreak: mockStats.maxStreak,
-  } : mockStats;
+  } : {
+    totalSolved: 0,
+    totalProblems: 3500,
+    easy: 0,
+    medium: 0,
+    hard: 0,
+  };
+
+  // Calculate average per day based on actual data
+  const avgPerDay = stats.totalSolved > 0 ? (stats.totalSolved / 365).toFixed(1) : '0';
 
   return (
     <section id="stats" className="py-16">
@@ -33,7 +48,7 @@ export function StatsSection({ stats: githubStats, isLoading }: StatsSectionProp
           className="mb-12"
         >
           <h2 className="text-3xl font-bold text-foreground mb-2">Statistics</h2>
-          <p className="text-muted-foreground">My LeetCode journey at a glance</p>
+          <p className="text-muted-foreground">Your LeetCode journey at a glance</p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -56,24 +71,15 @@ export function StatsSection({ stats: githubStats, isLoading }: StatsSectionProp
               label="problems solved"
             />
             
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-6 mt-8 w-full">
+            {/* Quick Stats - only average per day */}
+            <div className="mt-8 w-full">
               <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50">
                 <div className="p-2 rounded-lg bg-primary/10">
-                  <Zap className="w-5 h-5 text-primary" />
+                  <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats.currentStreak}</p>
-                  <p className="text-xs text-muted-foreground">Current Streak</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50">
-                <div className="p-2 rounded-lg bg-medium/10">
-                  <TrendingUp className="w-5 h-5 text-medium" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{stats.maxStreak}</p>
-                  <p className="text-xs text-muted-foreground">Max Streak</p>
+                  <p className="text-2xl font-bold text-foreground">{avgPerDay}</p>
+                  <p className="text-xs text-muted-foreground">Avg Problems/Day</p>
                 </div>
               </div>
             </div>
@@ -86,21 +92,27 @@ export function StatsSection({ stats: githubStats, isLoading }: StatsSectionProp
               count={stats.easy} 
               total={800}
               delay={0.1}
+              isActive={activeDifficulty === 'Easy'}
+              onClick={() => onDifficultyClick?.('Easy')}
             />
             <DifficultyCard 
               difficulty="Medium" 
               count={stats.medium} 
               total={1700}
               delay={0.2}
+              isActive={activeDifficulty === 'Medium'}
+              onClick={() => onDifficultyClick?.('Medium')}
             />
             <DifficultyCard 
               difficulty="Hard" 
               count={stats.hard} 
               total={500}
               delay={0.3}
+              isActive={activeDifficulty === 'Hard'}
+              onClick={() => onDifficultyClick?.('Hard')}
             />
             
-            {/* Additional Stats Cards */}
+            {/* Completion stat */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -108,44 +120,17 @@ export function StatsSection({ stats: githubStats, isLoading }: StatsSectionProp
               transition={{ delay: 0.4 }}
               className="sm:col-span-3 bg-card rounded-2xl border border-border p-6"
             >
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-primary/10">
-                    <Target className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold text-foreground">
-                      {Math.round((stats.totalSolved / stats.totalProblems) * 100)}%
-                    </p>
-                    <p className="text-sm text-muted-foreground">Completion</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-xl bg-primary/10">
+                  <Target className="w-6 h-6 text-primary" />
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-easy/10">
-                    <Calendar className="w-6 h-6 text-easy" />
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold text-foreground">127</p>
-                    <p className="text-sm text-muted-foreground">Active Days</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-medium/10">
-                    <TrendingUp className="w-6 h-6 text-medium" />
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold text-foreground">2.3</p>
-                    <p className="text-sm text-muted-foreground">Avg/Day</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-hard/10">
-                    <Zap className="w-6 h-6 text-hard" />
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold text-foreground">Top 8%</p>
-                    <p className="text-sm text-muted-foreground">Global Rank</p>
-                  </div>
+                <div>
+                  <p className="text-xl font-bold text-foreground">
+                    {stats.totalSolved > 0 
+                      ? Math.round((stats.totalSolved / stats.totalProblems) * 100) 
+                      : 0}%
+                  </p>
+                  <p className="text-sm text-muted-foreground">Overall Completion</p>
                 </div>
               </div>
             </motion.div>

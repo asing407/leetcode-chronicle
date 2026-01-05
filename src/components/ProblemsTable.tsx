@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, CheckCircle, ExternalLink, Code2, Loader2 } from 'lucide-react';
-import { problems as mockProblems, type Problem, type Difficulty } from '@/data/mockProblems';
-import { ProblemModal } from './ProblemModal';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import type { LeetCodeProblem } from '@/hooks/useGitHubLeetCode';
+import type { Difficulty } from '@/data/mockProblems';
 
 const languageIcons: Record<string, string> = {
   Python: '🐍',
@@ -24,6 +23,7 @@ const languageIcons: Record<string, string> = {
   Scala: '🔴',
   Shell: '🐚',
   SQL: '🗃️',
+  Unknown: '📄',
 };
 
 const difficultyStyles: Record<Difficulty, string> = {
@@ -32,51 +32,40 @@ const difficultyStyles: Record<Difficulty, string> = {
   Hard: 'bg-hard/10 text-hard border-hard/30',
 };
 
+type DifficultyFilter = 'all' | 'Easy' | 'Medium' | 'Hard';
+
 interface ProblemsTableProps {
   githubProblems?: LeetCodeProblem[];
   isLoading?: boolean;
+  difficultyFilter?: DifficultyFilter;
+  onDifficultyFilterChange?: (filter: DifficultyFilter) => void;
 }
 
-export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps) {
+export function ProblemsTable({ 
+  githubProblems = [], 
+  isLoading,
+  difficultyFilter: externalFilter,
+  onDifficultyFilterChange 
+}: ProblemsTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | 'All'>('All');
-  const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
-
-  // Convert GitHub problems to display format or use mock data
-  const displayProblems = useMemo(() => {
-    if (githubProblems && githubProblems.length > 0) {
-      return githubProblems.map((p): Problem & { solutionUrl?: string } => ({
-        id: parseInt(p.id) || 0,
-        title: p.title,
-        slug: p.slug,
-        difficulty: p.difficulty,
-        status: 'Accepted' as const,
-        timeComplexity: '-',
-        spaceComplexity: '-',
-        language: p.language as any,
-        tags: [],
-        code: '',
-        explanation: '',
-        solutionUrl: p.solutionUrl,
-      }));
-    }
-    return mockProblems;
-  }, [githubProblems]);
+  const [internalFilter, setInternalFilter] = useState<DifficultyFilter>('all');
+  
+  // Use external filter if provided, otherwise use internal
+  const selectedDifficulty = externalFilter ?? internalFilter;
+  const setSelectedDifficulty = onDifficultyFilterChange ?? setInternalFilter;
 
   const filteredProblems = useMemo(() => {
-    return displayProblems.filter((problem) => {
+    return githubProblems.filter((problem) => {
       const matchesSearch = 
         problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        problem.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+        problem.id.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesDifficulty = 
-        selectedDifficulty === 'All' || problem.difficulty === selectedDifficulty;
+        selectedDifficulty === 'all' || problem.difficulty === selectedDifficulty;
 
       return matchesSearch && matchesDifficulty;
     });
-  }, [searchQuery, selectedDifficulty, displayProblems]);
-
-  const isUsingGitHub = githubProblems && githubProblems.length > 0;
+  }, [searchQuery, selectedDifficulty, githubProblems]);
 
   return (
     <section id="problems" className="py-16">
@@ -90,9 +79,7 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
         >
           <h2 className="text-3xl font-bold text-foreground mb-2">Solved Problems</h2>
           <p className="text-muted-foreground">
-            {isUsingGitHub 
-              ? 'Synced from your LeetHub repository' 
-              : 'Click any problem to view the solution'}
+            Synced from your LeetHub repository
           </p>
         </motion.div>
 
@@ -107,7 +94,7 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search by name..."
+              placeholder="Search by name or ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-card border-border"
@@ -117,21 +104,21 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-muted-foreground" />
             <div className="flex gap-2">
-              {(['All', 'Easy', 'Medium', 'Hard'] as const).map((diff) => (
+              {(['all', 'Easy', 'Medium', 'Hard'] as const).map((diff) => (
                 <button
                   key={diff}
                   onClick={() => setSelectedDifficulty(diff)}
                   className={`
                     px-4 py-2 rounded-lg text-sm font-medium transition-all
                     ${selectedDifficulty === diff 
-                      ? diff === 'All' 
+                      ? diff === 'all' 
                         ? 'bg-primary text-primary-foreground' 
                         : difficultyStyles[diff as Difficulty]
                       : 'bg-card border border-border text-muted-foreground hover:text-foreground'
                     }
                   `}
                 >
-                  {diff}
+                  {diff === 'all' ? 'All' : diff}
                 </button>
               ))}
             </div>
@@ -157,20 +144,14 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
             {/* Table Header */}
             <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border bg-muted/30 text-sm font-medium text-muted-foreground">
               <div className="col-span-1">Status</div>
-              <div className={isUsingGitHub ? "col-span-6" : "col-span-4"}>Problem</div>
+              <div className="col-span-6">Problem</div>
               <div className="col-span-2">Difficulty</div>
-              {!isUsingGitHub && (
-                <>
-                  <div className="col-span-2">Time</div>
-                  <div className="col-span-2">Space</div>
-                </>
-              )}
               <div className="col-span-1">Lang</div>
-              {isUsingGitHub && <div className="col-span-2">Link</div>}
+              <div className="col-span-2">Link</div>
             </div>
 
             {/* Table Body */}
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
               <AnimatePresence>
                 {filteredProblems.map((problem, index) => (
                   <motion.div
@@ -179,10 +160,7 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ delay: Math.min(index * 0.02, 0.5) }}
-                    onClick={() => !isUsingGitHub && setSelectedProblem(problem)}
-                    className={`grid grid-cols-12 gap-4 px-6 py-4 transition-colors group ${
-                      !isUsingGitHub ? 'cursor-pointer hover:bg-muted/30' : ''
-                    }`}
+                    className="grid grid-cols-12 gap-4 px-6 py-4 transition-colors hover:bg-muted/30"
                   >
                     {/* Status */}
                     <div className="col-span-1 flex items-center">
@@ -190,30 +168,13 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
                     </div>
 
                     {/* Problem Name */}
-                    <div className={isUsingGitHub ? "col-span-6" : "col-span-4"}>
+                    <div className="col-span-6">
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground text-sm">#{problem.id}</span>
-                        <span className={`font-medium text-foreground ${!isUsingGitHub ? 'group-hover:text-primary' : ''} transition-colors`}>
+                        <span className="font-medium text-foreground">
                           {problem.title}
                         </span>
                       </div>
-                      {problem.tags && problem.tags.length > 0 && (
-                        <div className="flex gap-1 mt-1 flex-wrap">
-                          {problem.tags.slice(0, 2).map((tag) => (
-                            <span 
-                              key={tag}
-                              className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                          {problem.tags.length > 2 && (
-                            <span className="text-xs text-muted-foreground">
-                              +{problem.tags.length - 2}
-                            </span>
-                          )}
-                        </div>
-                      )}
                     </div>
 
                     {/* Difficulty */}
@@ -226,22 +187,6 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
                       </Badge>
                     </div>
 
-                    {/* Time/Space Complexity - only for mock data */}
-                    {!isUsingGitHub && (
-                      <>
-                        <div className="col-span-2 flex items-center">
-                          <code className="text-sm font-mono text-muted-foreground">
-                            {problem.timeComplexity}
-                          </code>
-                        </div>
-                        <div className="col-span-2 flex items-center">
-                          <code className="text-sm font-mono text-muted-foreground">
-                            {problem.spaceComplexity}
-                          </code>
-                        </div>
-                      </>
-                    )}
-
                     {/* Language */}
                     <div className="col-span-1 flex items-center">
                       <span className="text-lg" title={problem.language}>
@@ -250,49 +195,43 @@ export function ProblemsTable({ githubProblems, isLoading }: ProblemsTableProps)
                     </div>
 
                     {/* GitHub Link */}
-                    {isUsingGitHub && 'solutionUrl' in problem && problem.solutionUrl && (
-                      <div className="col-span-2 flex items-center">
-                        <a
-                          href={problem.solutionUrl as string}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 text-sm text-primary hover:underline"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          View
-                        </a>
-                      </div>
-                    )}
+                    <div className="col-span-2 flex items-center">
+                      <a
+                        href={problem.solutionUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-sm text-primary hover:underline"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View
+                      </a>
+                    </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
 
             {/* Empty State */}
-            {filteredProblems.length === 0 && (
+            {filteredProblems.length === 0 && !isLoading && (
               <div className="px-6 py-16 text-center">
-                <p className="text-muted-foreground">No problems found matching your criteria</p>
+                <p className="text-muted-foreground">
+                  {githubProblems.length === 0 
+                    ? 'No problems found in your repository' 
+                    : 'No problems match your search criteria'
+                  }
+                </p>
               </div>
             )}
           </motion.div>
         )}
 
         {/* Results Count */}
-        {!isLoading && (
+        {!isLoading && githubProblems.length > 0 && (
           <p className="text-sm text-muted-foreground mt-4">
-            Showing {filteredProblems.length} of {displayProblems.length} problems
+            Showing {filteredProblems.length} of {githubProblems.length} problems
           </p>
         )}
       </div>
-
-      {/* Problem Modal - only for mock data */}
-      {!isUsingGitHub && (
-        <ProblemModal 
-          problem={selectedProblem} 
-          onClose={() => setSelectedProblem(null)} 
-        />
-      )}
     </section>
   );
 }

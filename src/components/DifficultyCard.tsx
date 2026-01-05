@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion';
-import type { Difficulty } from '@/data/mockProblems';
+
+type DifficultyType = 'Easy' | 'Medium' | 'Hard';
 
 interface DifficultyCardProps {
-  difficulty: Difficulty;
+  difficulty: DifficultyType;
   count: number;
   total: number;
   delay?: number;
+  isActive?: boolean;
+  onClick?: () => void;
 }
 
 const difficultyConfig = {
@@ -14,6 +17,7 @@ const difficultyConfig = {
     textColor: 'text-easy',
     bgColor: 'bg-easy/10',
     borderColor: 'border-easy/30',
+    activeBorder: 'border-easy',
     total: 800,
   },
   Medium: {
@@ -21,6 +25,7 @@ const difficultyConfig = {
     textColor: 'text-medium',
     bgColor: 'bg-medium/10',
     borderColor: 'border-medium/30',
+    activeBorder: 'border-medium',
     total: 1700,
   },
   Hard: {
@@ -28,21 +33,36 @@ const difficultyConfig = {
     textColor: 'text-hard',
     bgColor: 'bg-hard/10',
     borderColor: 'border-hard/30',
+    activeBorder: 'border-hard',
     total: 500,
   },
 };
 
-export function DifficultyCard({ difficulty, count, total, delay = 0 }: DifficultyCardProps) {
+export function DifficultyCard({ 
+  difficulty, 
+  count, 
+  total, 
+  delay = 0,
+  isActive = false,
+  onClick
+}: DifficultyCardProps) {
   const config = difficultyConfig[difficulty];
-  const percentage = Math.round((count / total) * 100);
+  const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay }}
       whileHover={{ scale: 1.02, y: -4 }}
-      className={`relative overflow-hidden rounded-2xl border ${config.borderColor} ${config.bgColor} p-6`}
+      onClick={onClick}
+      className={`
+        relative overflow-hidden rounded-2xl border-2 p-6 transition-all
+        ${config.bgColor}
+        ${isActive ? config.activeBorder : config.borderColor}
+        ${onClick ? 'cursor-pointer' : ''}
+      `}
     >
       {/* Gradient accent */}
       <div className={`absolute top-0 left-0 w-full h-1 ${config.gradient}`} />
@@ -51,7 +71,7 @@ export function DifficultyCard({ difficulty, count, total, delay = 0 }: Difficul
         <span className={`text-lg font-semibold ${config.textColor}`}>
           {difficulty}
         </span>
-        <span className="text-xs text-muted-foreground">
+        <span className={`text-xs ${config.bgColor} ${config.textColor} px-2 py-1 rounded-full`}>
           {percentage}%
         </span>
       </div>
@@ -73,7 +93,8 @@ export function DifficultyCard({ difficulty, count, total, delay = 0 }: Difficul
         <motion.div
           className={`h-full ${config.gradient}`}
           initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
+          whileInView={{ width: `${percentage}%` }}
+          viewport={{ once: true }}
           transition={{ duration: 1, delay: delay + 0.3, ease: "easeOut" }}
         />
       </div>

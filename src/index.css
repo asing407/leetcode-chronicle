@@ -150,9 +150,7 @@
     @apply border-border;
   }
 
-  html {
-    @apply dark;
-  }
+  /* Theme is now controlled by ThemeContext - no default class */
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
