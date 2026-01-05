@@ -1,14 +1,17 @@
-import { Github, Linkedin, Flame, ExternalLink } from 'lucide-react';
+import { Github, Linkedin, ExternalLink, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { stats } from '@/data/mockProblems';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function Header() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <motion.header 
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="sticky top-0 z-50 glass border-b border-border/50"
+      className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border"
     >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
@@ -18,8 +21,8 @@ export function Header() {
               <span className="font-bold text-lg text-primary-foreground">LC</span>
             </div>
             <div>
-              <h1 className="font-semibold text-lg text-foreground">LeetCode Portfolio</h1>
-              <p className="text-xs text-muted-foreground">by Alex Developer</p>
+              <h1 className="font-semibold text-lg text-foreground">LeetCode Chronicle</h1>
+              <p className="text-xs text-muted-foreground">Track your coding journey</p>
             </div>
           </div>
 
@@ -46,17 +49,20 @@ export function Header() {
           </nav>
 
           {/* Right Section */}
-          <div className="flex items-center gap-4">
-            {/* Streak Counter */}
-            <motion.div 
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400 }}
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-lg"
             >
-              <Flame className="w-4 h-4 text-medium" />
-              <span className="text-sm font-medium text-foreground">{stats.currentStreak}</span>
-              <span className="text-xs text-muted-foreground">day streak</span>
-            </motion.div>
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </Button>
 
             {/* Social Links */}
             <div className="flex items-center gap-2">

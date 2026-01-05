@@ -1,7 +1,17 @@
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
-import { activityData, groupByWeeks, getMonthLabels, getActivityStats, type ActivityDay } from '@/data/activityData';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import type { LeetCodeProblem } from '@/hooks/useGitHubLeetCode';
+
+interface ActivityDay {
+  date: string;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
+}
+
+interface ActivityHeatmapProps {
+  problems?: LeetCodeProblem[];
+}
 
 const levelColors = {
   0: 'bg-muted',
@@ -11,12 +21,86 @@ const levelColors = {
   4: 'bg-easy',
 };
 
-export function ActivityHeatmap() {
+// Generate activity data from problems (placeholder - would need commit dates from GitHub)
+function generateActivityFromProblems(problems: LeetCodeProblem[]): ActivityDay[] {
+  const days: ActivityDay[] = [];
+  const today = new Date();
+  const oneYearAgo = new Date(today);
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+  // Start from the beginning of the week
+  const startDate = new Date(oneYearAgo);
+  startDate.setDate(startDate.getDate() - startDate.getDay());
+
+  // For now, we'll generate empty data since we don't have commit dates
+  // In a real implementation, you'd fetch commit history from GitHub
+  for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
+    days.push({
+      date: d.toISOString().split('T')[0],
+      count: 0,
+      level: 0,
+    });
+  }
+
+  return days;
+}
+
+function groupByWeeks(data: ActivityDay[]): ActivityDay[][] {
+  const weeks: ActivityDay[][] = [];
+  let currentWeek: ActivityDay[] = [];
+  
+  data.forEach((day, index) => {
+    const date = new Date(day.date);
+    const dayOfWeek = date.getDay();
+    
+    if (dayOfWeek === 0 && currentWeek.length > 0) {
+      weeks.push(currentWeek);
+      currentWeek = [];
+    }
+    
+    currentWeek.push(day);
+    
+    if (index === data.length - 1 && currentWeek.length > 0) {
+      weeks.push(currentWeek);
+    }
+  });
+  
+  return weeks;
+}
+
+function getMonthLabels(data: ActivityDay[]): { month: string; index: number }[] {
+  const labels: { month: string; index: number }[] = [];
+  let lastMonth = -1;
+  
+  const weeks = groupByWeeks(data);
+  
+  weeks.forEach((week, weekIndex) => {
+    const firstDay = week[0];
+    if (firstDay) {
+      const date = new Date(firstDay.date);
+      const month = date.getMonth();
+      
+      if (month !== lastMonth) {
+        const monthName = date.toLocaleString('default', { month: 'short' });
+        labels.push({ month: monthName, index: weekIndex });
+        lastMonth = month;
+      }
+    }
+  });
+  
+  return labels;
+}
+
+export function ActivityHeatmap({ problems = [] }: ActivityHeatmapProps) {
   const [hoveredDay, setHoveredDay] = useState<ActivityDay | null>(null);
   
-  const weeks = useMemo(() => groupByWeeks(activityData), []);
-  const monthLabels = useMemo(() => getMonthLabels(activityData), []);
-  const stats = useMemo(() => getActivityStats(activityData), []);
+  const activityData = useMemo(() => generateActivityFromProblems(problems), [problems]);
+  const weeks = useMemo(() => groupByWeeks(activityData), [activityData]);
+  const monthLabels = useMemo(() => getMonthLabels(activityData), [activityData]);
+
+  // Calculate stats
+  const activeDays = activityData.filter(day => day.count > 0).length;
+  const totalProblems = activityData.reduce((sum, day) => sum + day.count, 0);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -40,7 +124,7 @@ export function ActivityHeatmap() {
         <div>
           <h3 className="text-lg font-semibold text-foreground">Activity</h3>
           <p className="text-sm text-muted-foreground">
-            {stats.totalProblems} problems solved in the last year
+            {problems.length} problems solved total
           </p>
         </div>
         
@@ -55,6 +139,13 @@ export function ActivityHeatmap() {
           ))}
           <span>More</span>
         </div>
+      </div>
+
+      {/* Info message about activity tracking */}
+      <div className="mb-6 p-4 bg-muted/30 rounded-lg border border-border">
+        <p className="text-sm text-muted-foreground">
+          📊 Activity heatmap will show your daily solving pattern once commit dates are integrated from GitHub.
+        </p>
       </div>
 
       {/* Heatmap Container */}
@@ -94,7 +185,6 @@ export function ActivityHeatmap() {
             {/* Weeks */}
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-1">
-                {/* Pad the first week if it doesn't start on Sunday */}
                 {weekIndex === 0 && week.length < 7 && (
                   <>
                     {Array(7 - week.length).fill(null).map((_, i) => (
@@ -141,7 +231,6 @@ export function ActivityHeatmap() {
                   </Tooltip>
                 ))}
                 
-                {/* Pad the last week if needed */}
                 {weekIndex === weeks.length - 1 && week.length < 7 && (
                   <>
                     {Array(7 - week.length).fill(null).map((_, i) => (
@@ -160,17 +249,7 @@ export function ActivityHeatmap() {
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-easy animate-pulse" />
           <span className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{stats.activeDays}</span> active days
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Current streak: <span className="font-medium text-foreground">{stats.currentStreak}</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Longest streak: <span className="font-medium text-foreground">{stats.longestStreak}</span>
+            <span className="font-medium text-foreground">{activeDays}</span> active days
           </span>
         </div>
       </div>

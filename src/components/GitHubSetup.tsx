@@ -1,21 +1,24 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Github, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Github, ExternalLink, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useGitHubConfig } from '@/contexts/GitHubConfigContext';
+import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
 
-export function GitHubSetup() {
-  const { setConfig } = useGitHubConfig();
+interface GitHubSetupProps {
+  onConnected?: (repoUrl: string, username: string) => void;
+}
+
+export function GitHubSetup({ onConnected }: GitHubSetupProps) {
   const [repoUrl, setRepoUrl] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
 
   const parseGitHubUrl = (url: string): { owner: string; repo: string } | null => {
-    // Handle various GitHub URL formats
     const patterns = [
-      // https://github.com/owner/repo
       /github\.com\/([^\/]+)\/([^\/\s]+)/,
-      // owner/repo
       /^([^\/\s]+)\/([^\/\s]+)$/,
     ];
 
@@ -29,17 +32,47 @@ export function GitHubSetup() {
     return null;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     const parsed = parseGitHubUrl(repoUrl);
     if (!parsed) {
-      setError('Invalid GitHub repository URL or format. Use: owner/repo or full URL');
+      setError('Invalid GitHub repository URL. Use: owner/repo or full URL');
       return;
     }
 
-    setConfig(parsed);
+    if (!username.trim()) {
+      setError('Please enter your GitHub username');
+      return;
+    }
+
+    setIsValidating(true);
+
+    try {
+      // Validate the repository exists by calling our edge function
+      const { data, error: fetchError } = await supabase.functions.invoke('github-leetcode', {
+        body: { owner: parsed.owner, repo: parsed.repo }
+      });
+
+      if (fetchError) {
+        throw new Error(fetchError.message);
+      }
+
+      if (data?.error) {
+        setError(data.error);
+        return;
+      }
+
+      // Repository is valid - save config
+      const fullUrl = `https://github.com/${parsed.owner}/${parsed.repo}`;
+      onConnected?.(fullUrl, username.trim());
+    } catch (err) {
+      console.error('Validation error:', err);
+      setError('Failed to validate repository. Please check the URL and try again.');
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   return (
@@ -62,28 +95,55 @@ export function GitHubSetup() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              GitHub Repository
-            </label>
-            <Input
-              type="text"
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-              placeholder="username/leetcode-solutions or https://github.com/username/leetcode-solutions"
-              className="bg-muted/50"
-            />
-            {error && (
-              <p className="mt-2 text-sm text-destructive flex items-center gap-1">
-                <AlertCircle className="w-4 h-4" />
-                {error}
-              </p>
-            )}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="username" className="block text-sm font-medium text-foreground mb-2">
+                GitHub Username
+              </Label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Your GitHub username"
+                className="bg-muted/50"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="repoUrl" className="block text-sm font-medium text-foreground mb-2">
+                GitHub Repository
+              </Label>
+              <Input
+                id="repoUrl"
+                type="text"
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                placeholder="username/leetcode-solutions or https://github.com/username/leetcode-solutions"
+                className="bg-muted/50"
+              />
+            </div>
           </div>
 
-          <Button type="submit" className="w-full" size="lg">
-            <Github className="w-5 h-5 mr-2" />
-            Connect Repository
+          {error && (
+            <p className="text-sm text-destructive flex items-center gap-1">
+              <AlertCircle className="w-4 h-4" />
+              {error}
+            </p>
+          )}
+
+          <Button type="submit" className="w-full" size="lg" disabled={isValidating}>
+            {isValidating ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Validating...
+              </>
+            ) : (
+              <>
+                <Github className="w-5 h-5 mr-2" />
+                Connect Repository
+              </>
+            )}
           </Button>
         </form>
 
@@ -93,7 +153,7 @@ export function GitHubSetup() {
           </h3>
           <div className="space-y-3">
             <a
-              href="https://chromewebstore.google.com/detail/leethub-v3/kfcdmpkfpjliomhbjbppobfdmdngdoek"
+              href="https://chromewebstore.google.com/detail/leethub-v3/kdkgpjpenaeoodajljkflmlnkoihkmda"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
