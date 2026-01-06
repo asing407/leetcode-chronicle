@@ -16,15 +16,44 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { VantaBackground } from '@/components/VantaBackground';
+import { VantaBackground, BackgroundStyle } from '@/components/VantaBackground';
+import { BackgroundSelector } from '@/components/BackgroundSelector';
 
 type OnboardingOption = 'existing' | 'setup' | null;
+
+// Animation variants for scroll animations
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as const }
+  }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const }
+  }
+};
 
 export default function Landing() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [selectedOption, setSelectedOption] = useState<OnboardingOption>(null);
+  const [backgroundStyle, setBackgroundStyle] = useState<BackgroundStyle>('birds');
 
   // If user is logged in and has completed onboarding, redirect to dashboard
   if (user && profile?.onboarding_completed) {
@@ -34,7 +63,8 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background/80 relative">
-      <VantaBackground />
+      <VantaBackground style={backgroundStyle} />
+      
       {/* Header */}
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
@@ -56,7 +86,8 @@ export default function Landing() {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <BackgroundSelector value={backgroundStyle} onChange={setBackgroundStyle} />
               <Button
                 variant="ghost"
                 size="icon"
@@ -90,45 +121,56 @@ export default function Landing() {
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
             className="text-center max-w-4xl mx-auto"
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+            <motion.h2 
+              variants={fadeInUp}
+              className="text-4xl md:text-6xl font-bold text-foreground mb-6"
+            >
               Your LeetCode Journey,
               <span className="block text-primary">Beautifully Tracked</span>
-            </h2>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+            </motion.h2>
+            <motion.p 
+              variants={fadeInUp}
+              className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
+            >
               Connect your GitHub repository powered by LeetHub 3.0 and visualize your 
               coding progress with stunning analytics and insights.
-            </p>
+            </motion.p>
 
             {/* Feature Highlights */}
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-full border border-border">
+            <motion.div 
+              variants={fadeInUp}
+              className="flex flex-wrap justify-center gap-4 mb-12"
+            >
+              <div className="flex items-center gap-2 px-4 py-2 bg-card/80 backdrop-blur-sm rounded-full border border-border">
                 <BarChart3 className="w-4 h-4 text-primary" />
                 <span className="text-sm text-foreground">Real-time Stats</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-full border border-border">
+              <div className="flex items-center gap-2 px-4 py-2 bg-card/80 backdrop-blur-sm rounded-full border border-border">
                 <GitBranch className="w-4 h-4 text-primary" />
                 <span className="text-sm text-foreground">GitHub Sync</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-full border border-border">
+              <div className="flex items-center gap-2 px-4 py-2 bg-card/80 backdrop-blur-sm rounded-full border border-border">
                 <Zap className="w-4 h-4 text-primary" />
                 <span className="text-sm text-foreground">Activity Heatmap</span>
               </div>
-            </div>
+            </motion.div>
 
             {!user && (
-              <Button 
-                size="lg" 
-                onClick={() => navigate('/auth')}
-                className="h-14 px-8 text-lg gap-2"
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+              <motion.div variants={scaleIn}>
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate('/auth')}
+                  className="h-14 px-8 text-lg gap-2"
+                >
+                  Get Started Free
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </motion.div>
             )}
           </motion.div>
         </div>
@@ -136,12 +178,13 @@ export default function Landing() {
 
       {/* Onboarding Options - Show only if logged in but not onboarded */}
       {user && !profile?.onboarding_completed && (
-        <section className="py-16 bg-card/50">
+        <section className="py-16 bg-card/50 backdrop-blur-sm">
           <div className="container mx-auto px-6">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeInUp}
               className="text-center mb-12"
             >
               <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
@@ -152,13 +195,15 @@ export default function Landing() {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto"
+            >
               {/* Option A: Already using LeetHub */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
+              <motion.div variants={fadeInUp}>
                 <button
                   onClick={() => setSelectedOption('existing')}
                   className={`w-full p-6 rounded-2xl border-2 transition-all text-left ${
@@ -188,11 +233,7 @@ export default function Landing() {
               </motion.div>
 
               {/* Option B: New to LeetHub */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
+              <motion.div variants={fadeInUp}>
                 <button
                   onClick={() => setSelectedOption('setup')}
                   className={`w-full p-6 rounded-2xl border-2 transition-all text-left ${
@@ -220,7 +261,7 @@ export default function Landing() {
                   </div>
                 </button>
               </motion.div>
-            </div>
+            </motion.div>
 
             {/* Selected Option Content */}
             {selectedOption && (
@@ -328,9 +369,10 @@ export default function Landing() {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
             className="text-center mb-16"
           >
             <h3 className="text-3xl font-bold text-foreground mb-4">
@@ -341,12 +383,17 @@ export default function Landing() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
+          >
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="p-6 bg-card rounded-2xl border border-border"
+              variants={scaleIn}
+              whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+              className="p-6 bg-card/80 backdrop-blur-sm rounded-2xl border border-border"
             >
               <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center mb-4">
                 <BarChart3 className="w-6 h-6 text-green-500" />
@@ -358,10 +405,9 @@ export default function Landing() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="p-6 bg-card rounded-2xl border border-border"
+              variants={scaleIn}
+              whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+              className="p-6 bg-card/80 backdrop-blur-sm rounded-2xl border border-border"
             >
               <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-orange-500" />
@@ -373,10 +419,9 @@ export default function Landing() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="p-6 bg-card rounded-2xl border border-border"
+              variants={scaleIn}
+              whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+              className="p-6 bg-card/80 backdrop-blur-sm rounded-2xl border border-border"
             >
               <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
                 <GitBranch className="w-6 h-6 text-blue-500" />
@@ -386,16 +431,22 @@ export default function Landing() {
                 Data refreshes automatically whenever you solve new problems via LeetHub
               </p>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-border">
+      <motion.footer 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeInUp}
+        className="py-8 border-t border-border bg-background/60 backdrop-blur-sm"
+      >
         <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
           <p>LeetCode Chronicle — Track your coding journey beautifully</p>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }
