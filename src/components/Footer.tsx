@@ -19,7 +19,7 @@ export function Footer() {
             <div>
               <p className="font-semibold text-foreground">LeetCode Portfolio</p>
               <p className="text-sm text-muted-foreground">
-                Built with <Heart className="w-3 h-3 inline text-hard" /> and lots of coding
+                A way to keep track and prep for your interviews and upskill your coding skills!
               </p>
             </div>
           </motion.div>
@@ -32,7 +32,7 @@ export function Footer() {
             className="flex items-center gap-6"
           >
             <a
-              href="https://github.com"
+              href="https://github.com/asing407"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -41,7 +41,7 @@ export function Footer() {
               Source Code
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://linkedin.com/in/asing407"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -50,7 +50,7 @@ export function Footer() {
               LinkedIn
             </a>
             <a
-              href="https://leetcode.com"
+              href="https://leetcode.com/asing407"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -67,7 +67,7 @@ export function Footer() {
             viewport={{ once: true }}
             className="text-sm text-muted-foreground"
           >
-            © {new Date().getFullYear()} Alex Developer. All rights reserved.
+            © {new Date().getFullYear()} Anshumaan Singh. All rights reserved.
           </motion.p>
         </div>
       </div>

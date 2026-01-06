@@ -67,7 +67,7 @@ export function Header() {
             {/* Social Links */}
             <div className="flex items-center gap-2">
               <motion.a
-                href="https://github.com"
+                href="https://github.com/asing407"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors"
@@ -77,7 +77,7 @@ export function Header() {
                 <Github className="w-5 h-5 text-foreground" />
               </motion.a>
               <motion.a
-                href="https://linkedin.com"
+                href="https://linkedin.com/in/anshumaansingh98"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors"
@@ -87,7 +87,7 @@ export function Header() {
                 <Linkedin className="w-5 h-5 text-foreground" />
               </motion.a>
               <motion.a
-                href="https://leetcode.com"
+                href="https://leetcode.com/asing407"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors"
