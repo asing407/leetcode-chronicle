@@ -19,7 +19,7 @@ export function Footer() {
             <div>
               <p className="font-semibold text-foreground">LeetCode Portfolio</p>
               <p className="text-sm text-muted-foreground">
-                A way to keep track and prep for your interviews and upskill your coding skills!
+                A way to keep track and prepare for your interviews and upskill your coding skills!
               </p>
             </div>
           </motion.div>

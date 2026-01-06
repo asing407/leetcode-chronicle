@@ -131,14 +131,13 @@ export default function Landing() {
               className="text-4xl md:text-6xl font-bold text-foreground mb-6"
             >
               Your LeetCode Journey,
-              <span className="block text-primary">Beautifully Tracked</span>
+              <span className="block text-primary">seamlessly tracked</span>
             </motion.h2>
             <motion.p 
               variants={fadeInUp}
               className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
             >
-              Connect your GitHub repository powered by LeetHub 3.0 and visualize your 
-              coding progress with stunning analytics and insights.
+              Connect your GitHub repository to centralize your LeetHub 3.0 data, making it easy to manage your solved problems and stay organized for upcoming technical interviews.
             </motion.p>
 
             {/* Feature Highlights */}
@@ -379,7 +378,7 @@ export default function Landing() {
               Everything You Need to Track Progress
             </h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Beautiful visualizations and insights powered by your actual coding data
+              Seamlessly track your coding journey with beautiful visualizations and insights powered by your actual coding data.
             </p>
           </motion.div>
 
