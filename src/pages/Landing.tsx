@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { VantaBackground } from '@/components/VantaBackground';
 
 type OnboardingOption = 'existing' | 'setup' | null;
 
@@ -32,7 +33,8 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/80 relative">
+      <VantaBackground />
       {/* Header */}
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
