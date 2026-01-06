@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Github, ExternalLink, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Github, ExternalLink, AlertCircle, Loader2, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
+import { LeetHubGuide } from './LeetHubGuide';
 
 interface GitHubSetupProps {
   onConnected?: (repoUrl: string, username: string) => void;
@@ -15,6 +16,7 @@ export function GitHubSetup({ onConnected }: GitHubSetupProps) {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [isValidating, setIsValidating] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   const parseGitHubUrl = (url: string): { owner: string; repo: string } | null => {
     const patterns = [
@@ -74,6 +76,18 @@ export function GitHubSetup({ onConnected }: GitHubSetupProps) {
       setIsValidating(false);
     }
   };
+
+  const handleOpenChromeStore = () => {
+    window.open(
+      'https://chromewebstore.google.com/detail/leethub-v3/kdkgpjpenaeoodajljkflmlnkoihkmda',
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
+  if (showGuide) {
+    return <LeetHubGuide onClose={() => setShowGuide(false)} />;
+  }
 
   return (
     <motion.div
@@ -152,21 +166,33 @@ export function GitHubSetup({ onConnected }: GitHubSetupProps) {
             Don't have LeetHub set up?
           </h3>
           <div className="space-y-3">
-            <a
-              href="https://chromewebstore.google.com/detail/leethub-v3/kdkgpjpenaeoodajljkflmlnkoihkmda"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
+            <button
+              onClick={handleOpenChromeStore}
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group text-left"
             >
               <div className="p-2 rounded-lg bg-primary/10">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
+                <ExternalLink className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Install LeetHub 3.0</p>
                 <p className="text-xs text-muted-foreground">Chrome extension to auto-sync solutions</p>
               </div>
               <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-            </a>
+            </button>
+
+            <button
+              onClick={() => setShowGuide(true)}
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group text-left"
+            >
+              <div className="p-2 rounded-lg bg-accent/50">
+                <HelpCircle className="w-5 h-5 text-accent-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">View Setup Guide</p>
+                <p className="text-xs text-muted-foreground">Step-by-step walkthrough with FAQs</p>
+              </div>
+              <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            </button>
           </div>
         </div>
       </div>
