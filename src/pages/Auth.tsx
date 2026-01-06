@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Github, Mail, Lock, User, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,7 @@ const passwordSchema = z.string().min(6, { message: "Password must be at least 6
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { user, signIn, signUp, signInWithGitHub, isLoading: authLoading } = useAuth();
+  const { user, signIn, signUp, isLoading: authLoading } = useAuth();
   
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -91,17 +91,6 @@ export default function Auth() {
     }
   };
 
-  const handleGitHubAuth = async () => {
-    setError(null);
-    setIsLoading(true);
-    
-    const { error } = await signInWithGitHub();
-    if (error) {
-      setError(error.message);
-      setIsLoading(false);
-    }
-    // OAuth redirects, so no need to setIsLoading(false) on success
-  };
 
   if (authLoading) {
     return (
@@ -150,29 +139,6 @@ export default function Auth() {
 
           {/* Auth Card */}
           <div className="bg-card border border-border rounded-2xl p-8">
-            {/* GitHub OAuth */}
-            <Button
-              onClick={handleGitHubAuth}
-              disabled={isLoading}
-              variant="outline"
-              className="w-full h-12 gap-3 text-base font-medium mb-6"
-            >
-              <Github className="w-5 h-5" />
-              Continue with GitHub
-            </Button>
-
-            {/* Divider */}
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  or continue with email
-                </span>
-              </div>
-            </div>
-
             {/* Error Message */}
             {error && (
               <motion.div
