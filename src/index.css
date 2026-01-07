@@ -12,50 +12,77 @@
 
 @layer base {
   :root {
-    --background: 60 4% 95%;
-    --foreground: 24 9% 10%;
-    --card: 60 9% 97%;
-    --card-foreground: 24 9% 10%;
-    --popover: 20 5% 90%;
-    --popover-foreground: 24 9% 10%;
-    --primary: 37 92% 50%;
-    --primary-foreground: 47 100% 96%;
-    --secondary: 24 5% 44%;
-    --secondary-foreground: 60 9% 97%;
-    --muted: 23 5% 82%;
-    --muted-foreground: 24 9% 10%;
-    --accent: 47 100% 96%;
-    --accent-foreground: 37 92% 50%;
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 85% 97%;
-    --border: 23 5% 82%;
-    --input: 23 5% 82%;
-    --ring: 37 92% 50%;
-    --radius: 1rem;
-    --chart-1: 45 96% 64%;
-    --chart-2: 47 95% 53%;
-    --chart-3: 43 96% 56%;
-    --chart-4: 37 92% 50%;
-    --chart-5: 24 5% 44%;
-    --sidebar: 60 9% 97%;
-    --sidebar-foreground: 24 9% 10%;
-    --sidebar-primary: 37 92% 50%;
-    --sidebar-primary-foreground: 47 100% 96%;
-    --sidebar-accent: 24 5% 44%;
-    --sidebar-accent-foreground: 60 9% 97%;
-    --sidebar-border: 23 5% 82%;
-    --sidebar-ring: 37 92% 50%;
-    --font-sans: 'Source Sans Pro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --font-serif: 'Source Serif Pro', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-    --font-mono: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    /* Light theme - Clean & Modern */
+    --background: 220 20% 98%;
+    --foreground: 220 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 25% 10%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 217 91% 95%;
+    --accent-foreground: 217 91% 40%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+    --radius: 0.75rem;
+    
+    /* LeetCode difficulty colors */
+    --easy: 142 76% 36%;
+    --easy-foreground: 0 0% 100%;
+    --medium: 38 92% 50%;
+    --medium-foreground: 0 0% 100%;
+    --hard: 0 84% 60%;
+    --hard-foreground: 0 0% 100%;
+    
+    /* Charts */
+    --chart-1: 217 91% 60%;
+    --chart-2: 142 76% 46%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 190 80% 50%;
+    
+    /* Sidebar */
+    --sidebar: 220 20% 97%;
+    --sidebar-foreground: 220 25% 10%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 91% 95%;
+    --sidebar-accent-foreground: 217 91% 40%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217 91% 60%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(280 65% 60%));
+    --gradient-easy: linear-gradient(135deg, hsl(142 76% 36%), hsl(160 84% 39%));
+    --gradient-medium: linear-gradient(135deg, hsl(38 92% 50%), hsl(25 95% 53%));
+    --gradient-hard: linear-gradient(135deg, hsl(0 84% 60%), hsl(350 89% 50%));
+    
+    /* Glass effect for light mode */
+    --glass-background: hsla(0 0% 100% / 0.7);
+    --glass-border: hsla(220 13% 80% / 0.5);
+    
+    /* Shadows */
+    --shadow-2xs: 0 1px 2px 0 hsl(220 20% 20% / 0.03);
+    --shadow-xs: 0 1px 3px 0 hsl(220 20% 20% / 0.04);
+    --shadow-sm: 0 1px 3px 0 hsl(220 20% 20% / 0.06), 0 1px 2px -1px hsl(220 20% 20% / 0.06);
+    --shadow: 0 4px 6px -1px hsl(220 20% 20% / 0.08), 0 2px 4px -2px hsl(220 20% 20% / 0.08);
+    --shadow-md: 0 4px 6px -1px hsl(220 20% 20% / 0.1), 0 2px 4px -2px hsl(220 20% 20% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(220 20% 20% / 0.1), 0 4px 6px -4px hsl(220 20% 20% / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(220 20% 20% / 0.1), 0 8px 10px -6px hsl(220 20% 20% / 0.1);
+    --shadow-2xl: 0 25px 50px -12px hsl(220 20% 20% / 0.25);
+    --shadow-glow: 0 0 32px -8px hsl(217 91% 60% / 0.25);
+    
+    --font-sans: 'Inter', 'Source Sans Pro', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Source Serif Pro', ui-serif, Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'Source Code Pro', ui-monospace, monospace;
     --tracking-normal: 0em;
     --spacing: 0.25rem;
   }
