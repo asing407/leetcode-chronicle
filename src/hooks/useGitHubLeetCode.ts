@@ -10,6 +10,9 @@ export interface LeetCodeProblem {
   solutionUrl: string;
   folderPath: string;
   lastUpdated?: string;
+  tags: string[];
+  timeComplexity?: string;
+  spaceComplexity?: string;
 }
 
 export interface LeetCodeStats {
