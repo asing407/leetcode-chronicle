@@ -8,6 +8,8 @@ import { CategorizedProblems } from '@/components/CategorizedProblems';
 import { ActivityHeatmap } from '@/components/ActivityHeatmap';
 import { Footer } from '@/components/Footer';
 import { GitHubSetup } from '@/components/GitHubSetup';
+import { VantaBackground, BackgroundStyle } from '@/components/VantaBackground';
+import { BackgroundSelector } from '@/components/BackgroundSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGitHubLeetCode } from '@/hooks/useGitHubLeetCode';
 import { RefreshCw, Settings, AlertCircle, Loader2, List, Layers } from 'lucide-react';
@@ -20,6 +22,14 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, profile, isLoading: authLoading, updateProfile } = useAuth();
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
+  const [backgroundStyle, setBackgroundStyle] = useState<BackgroundStyle>(() => {
+    return (localStorage.getItem('dashboard-bg-style') as BackgroundStyle) || 'birds';
+  });
+
+  // Persist background preference
+  useEffect(() => {
+    localStorage.setItem('dashboard-bg-style', backgroundStyle);
+  }, [backgroundStyle]);
   
   // Get GitHub config from profile
   const githubConfig = profile?.github_repo_url ? (() => {
@@ -102,8 +112,16 @@ export default function Dashboard() {
     : problems.filter(p => p.difficulty === difficultyFilter);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <VantaBackground style={backgroundStyle} />
       <DashboardHeader />
+      
+      {/* Background Selector - Fixed Position */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-1">
+          <BackgroundSelector value={backgroundStyle} onChange={setBackgroundStyle} />
+        </div>
+      </div>
       <main>
         {/* Status Bar */}
         <div className="container mx-auto px-6 py-4">
