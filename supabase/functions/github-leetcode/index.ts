@@ -28,6 +28,9 @@ interface ProblemData {
   solutionUrl: string;
   folderPath: string;
   lastUpdated?: string;
+  tags: string[];
+  timeComplexity?: string;
+  spaceComplexity?: string;
 }
 
 // Language extension mapping
@@ -57,6 +60,77 @@ const languageMap: Record<string, string> = {
   'sh': 'Shell',
   'bash': 'Shell',
 };
+
+// Parse tags/topics from README content
+function parseTagsFromReadme(content: string): string[] {
+  const tags: Set<string> = new Set();
+  
+  // Pattern 1: "Related Topics" section with links (LeetHub format)
+  // e.g., [![](https://img.shields.io/badge/Array-...)]
+  const badgePattern = /badge[/%-]([A-Za-z0-9%20-]+?)[%-]/gi;
+  let match;
+  while ((match = badgePattern.exec(content)) !== null) {
+    const tag = decodeURIComponent(match[1].replace(/%20/g, ' ').replace(/-/g, ' '))
+      .replace(/\s+/g, ' ')
+      .trim();
+    // Filter out difficulty badges and common non-tags
+    if (!['Easy', 'Medium', 'Hard', 'Difficulty', 'LeetCode', ''].includes(tag) && tag.length < 30) {
+      tags.add(tag);
+    }
+  }
+  
+  // Pattern 2: Topics listed in markdown (e.g., "**Topics:** Array, Hash Table")
+  const topicsMatch = content.match(/(?:topics?|tags?|related\s*topics?)[:\s]*([^\n]+)/i);
+  if (topicsMatch) {
+    const topicList = topicsMatch[1]
+      .replace(/\*\*/g, '')
+      .replace(/`/g, '')
+      .split(/[,;|]/)
+      .map(t => t.trim())
+      .filter(t => t.length > 0 && t.length < 30);
+    topicList.forEach(t => tags.add(t));
+  }
+  
+  // Pattern 3: Common DSA keywords in the content
+  const dsaKeywords = [
+    'Array', 'String', 'Hash Table', 'Hash Map', 'Linked List', 'Stack', 'Queue',
+    'Tree', 'Binary Tree', 'Binary Search Tree', 'BST', 'Heap', 'Priority Queue',
+    'Graph', 'DFS', 'BFS', 'Depth-First Search', 'Breadth-First Search',
+    'Dynamic Programming', 'DP', 'Greedy', 'Backtracking', 'Recursion',
+    'Sorting', 'Binary Search', 'Two Pointers', 'Sliding Window',
+    'Divide and Conquer', 'Bit Manipulation', 'Math', 'Trie',
+    'Union Find', 'Topological Sort', 'Matrix', 'Simulation',
+    'Design', 'Counting', 'Prefix Sum', 'Memoization'
+  ];
+  
+  const lowerContent = content.toLowerCase();
+  dsaKeywords.forEach(keyword => {
+    if (lowerContent.includes(keyword.toLowerCase())) {
+      tags.add(keyword);
+    }
+  });
+  
+  return Array.from(tags).slice(0, 10); // Limit to 10 tags
+}
+
+// Parse complexity from README content
+function parseComplexityFromReadme(content: string): { time?: string; space?: string } {
+  const result: { time?: string; space?: string } = {};
+  
+  // Time complexity patterns
+  const timeMatch = content.match(/time\s*(?:complexity)?[:\s]*[`*]*([OoΘθΩω]\s*\([^)]+\))/i);
+  if (timeMatch) {
+    result.time = timeMatch[1].trim();
+  }
+  
+  // Space complexity patterns
+  const spaceMatch = content.match(/space\s*(?:complexity)?[:\s]*[`*]*([OoΘθΩω]\s*\([^)]+\))/i);
+  if (spaceMatch) {
+    result.space = spaceMatch[1].trim();
+  }
+  
+  return result;
+}
 
 // Parse difficulty from README content
 function parseDifficultyFromReadme(content: string): 'Easy' | 'Medium' | 'Hard' {
@@ -269,6 +343,9 @@ serve(async (req) => {
           );
 
           let difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium';
+          let tags: string[] = [];
+          let timeComplexity: string | undefined;
+          let spaceComplexity: string | undefined;
           
           if (readmeFile?.download_url) {
             try {
@@ -276,6 +353,10 @@ serve(async (req) => {
               if (readmeResponse.ok) {
                 const readmeContent = await readmeResponse.text();
                 difficulty = parseDifficultyFromReadme(readmeContent);
+                tags = parseTagsFromReadme(readmeContent);
+                const complexity = parseComplexityFromReadme(readmeContent);
+                timeComplexity = complexity.time;
+                spaceComplexity = complexity.space;
               }
             } catch (e) {
               console.error(`Failed to parse README for ${folder.name}:`, e);
@@ -292,6 +373,9 @@ serve(async (req) => {
             language,
             solutionUrl: solutionFile?.html_url || folder.html_url,
             folderPath: folder.path,
+            tags,
+            timeComplexity,
+            spaceComplexity,
           };
         } catch (error) {
           console.error(`Error processing folder ${folder.name}:`, error);

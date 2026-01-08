@@ -4,13 +4,15 @@ import { DashboardHeader } from '@/components/DashboardHeader';
 import { StatsSection } from '@/components/StatsSection';
 import { SkillsSection } from '@/components/SkillsSection';
 import { ProblemsTable } from '@/components/ProblemsTable';
+import { CategorizedProblems } from '@/components/CategorizedProblems';
 import { ActivityHeatmap } from '@/components/ActivityHeatmap';
 import { Footer } from '@/components/Footer';
 import { GitHubSetup } from '@/components/GitHubSetup';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGitHubLeetCode } from '@/hooks/useGitHubLeetCode';
-import { RefreshCw, Settings, AlertCircle, Loader2 } from 'lucide-react';
+import { RefreshCw, Settings, AlertCircle, Loader2, List, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type DifficultyFilter = 'all' | 'Easy' | 'Medium' | 'Hard';
 
@@ -166,12 +168,40 @@ export default function Dashboard() {
         </section>
         
         <SkillsSection problems={problems} />
-        <ProblemsTable 
-          githubProblems={filteredProblems}
-          isLoading={isLoading}
-          difficultyFilter={difficultyFilter}
-          onDifficultyFilterChange={setDifficultyFilter}
-        />
+        
+        {/* Problems View with Tabs */}
+        <section className="py-8">
+          <div className="container mx-auto px-6">
+            <Tabs defaultValue="table" className="w-full">
+              <TabsList className="mb-6">
+                <TabsTrigger value="table" className="gap-2">
+                  <List className="w-4 h-4" />
+                  Table View
+                </TabsTrigger>
+                <TabsTrigger value="categorized" className="gap-2">
+                  <Layers className="w-4 h-4" />
+                  By Category
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="table">
+                <ProblemsTable 
+                  githubProblems={filteredProblems}
+                  isLoading={isLoading}
+                  difficultyFilter={difficultyFilter}
+                  onDifficultyFilterChange={setDifficultyFilter}
+                />
+              </TabsContent>
+              
+              <TabsContent value="categorized">
+                <CategorizedProblems 
+                  problems={problems}
+                  isLoading={isLoading}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
