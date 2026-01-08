@@ -125,7 +125,7 @@ export default function Dashboard() {
       <main>
         {/* Status Bar */}
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4 p-4 bg-card rounded-xl border border-border">
+          <div className="flex items-center justify-between flex-wrap gap-4 p-4 bg-card/70 backdrop-blur-xl rounded-xl border border-border/50 shadow-lg">
             <div className="flex items-center gap-4">
               <div className="text-sm text-muted-foreground">
                 Connected to: <span className="text-foreground font-medium">{githubConfig.owner}/{githubConfig.repo}</span>
@@ -161,7 +161,7 @@ export default function Dashboard() {
         {/* Error State */}
         {error && (
           <div className="container mx-auto px-6 pb-4">
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-start gap-3">
+            <div className="p-4 bg-destructive/10 backdrop-blur-xl border border-destructive/20 rounded-xl flex items-start gap-3 shadow-lg">
               <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-destructive">Failed to fetch data</p>

@@ -51,7 +51,7 @@ export function SkillsSection({ problems = [] }: SkillsSectionProps) {
   }, [problems]);
 
   return (
-    <section id="skills" className="py-16 bg-card/50">
+    <section id="skills" className="py-16">
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <motion.div
@@ -70,7 +70,7 @@ export function SkillsSection({ problems = [] }: SkillsSectionProps) {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="lg:col-span-2 bg-card rounded-3xl border border-border p-8"
+            className="lg:col-span-2 bg-card/70 backdrop-blur-xl rounded-3xl border border-border/50 p-8 shadow-xl"
           >
             <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
               <Code2 className="w-5 h-5 text-primary" />
@@ -142,7 +142,7 @@ export function SkillsSection({ problems = [] }: SkillsSectionProps) {
             viewport={{ once: true }}
             className="space-y-4"
           >
-            <div className="bg-card rounded-2xl border border-border p-6">
+            <div className="bg-card/70 backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg gradient-primary">
                   <Brain className="w-5 h-5 text-primary-foreground" />
@@ -155,7 +155,7 @@ export function SkillsSection({ problems = [] }: SkillsSectionProps) {
               </p>
             </div>
 
-            <div className="bg-card rounded-2xl border border-border p-6">
+            <div className="bg-card/70 backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-easy/20">
                   <Layers className="w-5 h-5 text-easy" />
@@ -169,7 +169,7 @@ export function SkillsSection({ problems = [] }: SkillsSectionProps) {
             </div>
 
             {languages.length > 0 && (
-              <div className="bg-gradient-to-br from-primary/10 to-transparent rounded-2xl border border-primary/20 p-6">
+              <div className="bg-gradient-to-br from-primary/10 to-transparent backdrop-blur-xl rounded-2xl border border-primary/20 p-6 shadow-lg">
                 <h3 className="font-semibold text-foreground mb-3">All Languages</h3>
                 <div className="flex flex-wrap gap-2">
                   {languages.map((lang) => (

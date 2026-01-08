@@ -117,7 +117,7 @@ export function ActivityHeatmap({ problems = [] }: ActivityHeatmapProps) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-card rounded-3xl border border-border p-6 overflow-hidden"
+      className="bg-card/70 backdrop-blur-xl rounded-3xl border border-border/50 p-6 overflow-hidden shadow-xl"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
