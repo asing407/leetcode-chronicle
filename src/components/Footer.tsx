@@ -3,7 +3,7 @@ import { Heart, Github, Linkedin, ExternalLink } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="py-12 border-t border-border bg-card/50">
+    <footer className="py-12 border-t border-border/50 bg-card/50 backdrop-blur-xl">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Left - Branding */}

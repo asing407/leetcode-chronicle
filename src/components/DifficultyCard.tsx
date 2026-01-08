@@ -58,8 +58,8 @@ export function DifficultyCard({
       whileHover={{ scale: 1.02, y: -4 }}
       onClick={onClick}
       className={`
-        relative overflow-hidden rounded-2xl border-2 p-6 transition-all
-        ${config.bgColor}
+        relative overflow-hidden rounded-2xl border-2 p-6 transition-all backdrop-blur-xl shadow-lg
+        ${config.bgColor} bg-opacity-70
         ${isActive ? config.activeBorder : config.borderColor}
         ${onClick ? 'cursor-pointer' : ''}
       `}

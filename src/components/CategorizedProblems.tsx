@@ -190,7 +190,7 @@ export function CategorizedProblems({ problems, isLoading }: CategorizedProblems
                 key={category}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-card rounded-xl border border-border overflow-hidden"
+                className="bg-card/70 backdrop-blur-xl rounded-xl border border-border/50 overflow-hidden shadow-lg"
               >
                 {/* Category Header */}
                 <button
