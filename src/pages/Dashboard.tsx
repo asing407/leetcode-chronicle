@@ -8,8 +8,6 @@ import { CategorizedProblems } from '@/components/CategorizedProblems';
 import { ActivityHeatmap } from '@/components/ActivityHeatmap';
 import { Footer } from '@/components/Footer';
 import { GitHubSetup } from '@/components/GitHubSetup';
-import { VantaBackground, BackgroundStyle } from '@/components/VantaBackground';
-import { BackgroundSelector } from '@/components/BackgroundSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGitHubLeetCode } from '@/hooks/useGitHubLeetCode';
 import { RefreshCw, Settings, AlertCircle, Loader2, List, Layers } from 'lucide-react';
@@ -22,14 +20,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, profile, isLoading: authLoading, updateProfile } = useAuth();
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
-  const [backgroundStyle, setBackgroundStyle] = useState<BackgroundStyle>(() => {
-    return (localStorage.getItem('dashboard-bg-style') as BackgroundStyle) || 'birds';
-  });
-
-  // Persist background preference
-  useEffect(() => {
-    localStorage.setItem('dashboard-bg-style', backgroundStyle);
-  }, [backgroundStyle]);
   
   // Get GitHub config from profile
   const githubConfig = profile?.github_repo_url ? (() => {
@@ -112,20 +102,12 @@ export default function Dashboard() {
     : problems.filter(p => p.difficulty === difficultyFilter);
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <VantaBackground style={backgroundStyle} />
+    <div className="min-h-screen bg-background">
       <DashboardHeader />
-      
-      {/* Background Selector - Fixed Position */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg p-1">
-          <BackgroundSelector value={backgroundStyle} onChange={setBackgroundStyle} />
-        </div>
-      </div>
       <main>
         {/* Status Bar */}
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4 p-4 bg-card/70 backdrop-blur-xl rounded-xl border border-border/50 shadow-lg">
+          <div className="flex items-center justify-between flex-wrap gap-4 p-4 bg-card rounded-xl border border-border">
             <div className="flex items-center gap-4">
               <div className="text-sm text-muted-foreground">
                 Connected to: <span className="text-foreground font-medium">{githubConfig.owner}/{githubConfig.repo}</span>
@@ -161,7 +143,7 @@ export default function Dashboard() {
         {/* Error State */}
         {error && (
           <div className="container mx-auto px-6 pb-4">
-            <div className="p-4 bg-destructive/10 backdrop-blur-xl border border-destructive/20 rounded-xl flex items-start gap-3 shadow-lg">
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-destructive">Failed to fetch data</p>

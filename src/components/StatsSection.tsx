@@ -57,7 +57,7 @@ export function StatsSection({
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="lg:col-span-5 bg-card/70 backdrop-blur-xl rounded-3xl border border-border/50 p-8 flex flex-col items-center justify-center relative shadow-xl"
+            className="lg:col-span-5 bg-card rounded-3xl border border-border p-8 flex flex-col items-center justify-center relative"
           >
             {isLoading && (
               <div className="absolute inset-0 bg-card/80 backdrop-blur-sm rounded-3xl flex items-center justify-center z-10">
@@ -118,7 +118,7 @@ export function StatsSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
-              className="sm:col-span-3 bg-card/70 backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-lg"
+              className="sm:col-span-3 bg-card rounded-2xl border border-border p-6"
             >
               <div className="flex items-center gap-3">
                 <div className="p-3 rounded-xl bg-primary/10">

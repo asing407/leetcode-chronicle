@@ -4,13 +4,6 @@ import * as THREE from 'three';
 
 export type BackgroundStyle = 'birds' | 'net' | 'waves' | 'none';
 
-// Extend window to include THREE for Vanta
-declare global {
-  interface Window {
-    THREE: typeof THREE;
-  }
-}
-
 interface VantaBackgroundProps {
   style?: BackgroundStyle;
 }
@@ -36,9 +29,6 @@ export const VantaBackground = ({ style = 'birds' }: VantaBackgroundProps) => {
       if (vantaEffect) {
         vantaEffect.destroy();
       }
-
-      // Make THREE available globally for Vanta
-      window.THREE = THREE;
 
       const isDark = theme === 'dark';
 
