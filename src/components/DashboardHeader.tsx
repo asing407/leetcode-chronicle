@@ -1,5 +1,6 @@
-import { Github, LogOut, Sun, Moon, User } from 'lucide-react';
+import { Github, LogOut, Sun, Moon, Map } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -40,31 +41,20 @@ export function DashboardHeader() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8">
-            <a 
-              href="#stats" 
+          <nav className="hidden md:flex items-center gap-6">
+            <Link 
+              to="/dashboard" 
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Statistics
-            </a>
-            <a 
-              href="#activity" 
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              Dashboard
+            </Link>
+            <Link 
+              to="/roadmap" 
+              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
             >
-              Activity
-            </a>
-            <a 
-              href="#skills" 
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Skills
-            </a>
-            <a 
-              href="#problems" 
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Problems
-            </a>
+              <Map className="w-4 h-4" />
+              NeetCode Roadmaps
+            </Link>
           </nav>
 
           {/* Right Section */}
