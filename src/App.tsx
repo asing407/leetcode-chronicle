@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import NeetCodeRoadmap from "./pages/NeetCodeRoadmap";
 import NotFound from "./pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -25,6 +26,7 @@ const App = () => (
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/roadmap" element={<NeetCodeRoadmap />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
